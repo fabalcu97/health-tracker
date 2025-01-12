@@ -4,6 +4,8 @@
 
 type Mutation {
   removeUser(id: Int!): User!
+  signIn(input: SignInInput!): User!
+  signUp(input: SignUpInput!): User!
 }
 
 type Query {
@@ -11,9 +13,19 @@ type Query {
   users: [User!]!
 }
 
+input SignInInput {
+  email: String!
+  password: String!
+}
+
+input SignUpInput {
+  email: String!
+  password: String!
+}
+
 type User {
   createdAt: String!
   email: String!
   id: Int!
-  name: String!
+  name: String
 }

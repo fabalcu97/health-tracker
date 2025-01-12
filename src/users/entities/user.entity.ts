@@ -1,4 +1,4 @@
-import { ObjectType, Field, Int, HideField } from '@nestjs/graphql';
+import { ObjectType, Field, Int } from '@nestjs/graphql';
 
 import { User as PrismaUser } from 'prisma/prisma-client';
 
@@ -10,15 +10,9 @@ export class User implements PrismaUser {
   @Field(() => String)
   email: string;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   name: string;
 
   @Field(() => String)
   createdAt: Date;
-
-  @HideField()
-  password: string;
-
-  @HideField()
-  salt: string;
 }

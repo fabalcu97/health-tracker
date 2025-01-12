@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import { compare, genSalt, hash } from 'bcrypt';
 import {
   Injectable,
   BadRequestException,
@@ -20,7 +20,7 @@ export class AuthService {
     private usersService: UsersService,
   ) {}
 
-  async signIn(email: string, password: string): Promise<any> {
+  async signIn(email: string, password: string): Promise<User> {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       throw new BadRequestException(Errors.BAD_CREDENTIALS);
@@ -34,10 +34,7 @@ export class AuthService {
     }
     const preferredAuthMethod = auth[0];
 
-    const isMatch = await bcrypt.compare(
-      password,
-      preferredAuthMethod.password,
-    );
+    const isMatch = await compare(password, preferredAuthMethod.password);
 
     if (isMatch) {
       return user;
@@ -46,18 +43,18 @@ export class AuthService {
     throw new BadRequestException(Errors.BAD_CREDENTIALS);
   }
 
-  async signUp(input: SignUpInput): Promise<any> {
+  async signUp(input: SignUpInput): Promise<User> {
     const { email, password } = input;
     const existingUser = await this.usersService.findByEmail(email);
     if (existingUser) {
       throw new BadRequestException(Errors.USER_ALREADY_EXISTS);
     }
 
-    const salt = await bcrypt.genSalt(this.saltRounds);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const salt = await genSalt(this.saltRounds);
+    const hashedPassword = await hash(password, salt);
 
     let newUser: User;
-    this.dbService
+    await this.dbService
       .$transaction(async () => {
         newUser = await this.dbService.user.create({ data: { email } });
 
