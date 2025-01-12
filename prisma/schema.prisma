@@ -13,11 +13,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Auth {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+
+  // Auth fields
+  password String
+  salt     String
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   createdAt DateTime @default(now())
-  name      String
-  password  String
-  salt      String
+  name      String?
+  Auth      Auth[]
 }
