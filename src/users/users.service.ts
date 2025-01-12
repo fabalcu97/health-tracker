@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserInput } from './dto/create-user.input';
 import { DatabaseService } from 'src/database/database.service';
+import { CreateUserInput } from 'src/users/dto/create-user.input';
 
 @Injectable()
 export class UsersService {
@@ -10,19 +10,16 @@ export class UsersService {
     return this.dbService.user.create({
       data: {
         email: createUserInput.email,
-        name: createUserInput.name,
-        password: createUserInput.password,
-        salt: '',
       },
     });
   }
 
-  findAll() {
-    return this.dbService.user.findMany();
+  findByEmail(email: string) {
+    return this.dbService.user.findUnique({ where: { email } });
   }
 
-  findOne(email: string) {
-    return this.dbService.user.findUnique({ where: { email } });
+  findAll() {
+    return this.dbService.user.findMany();
   }
 
   remove(id: number) {
